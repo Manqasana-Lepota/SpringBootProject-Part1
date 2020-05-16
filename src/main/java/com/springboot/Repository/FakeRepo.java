@@ -3,28 +3,38 @@ package com.springboot.Repository;
 import com.springboot.Model.User;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 public class FakeRepo implements FakeRepoInterface {
 
-    private ArrayList<User> users = new ArrayList<>();
+    private List<User> userList = new CopyOnWriteArrayList<>();
 
     @Override
-    public void insertUser(long id, String name, String surname) {
-        users.add(new User(id,name,surname));
-
+    public User insertUser(long id, String name, String surname) {
+        userList.add(new User(id, name, surname));
+        return new User(id, name, surname);
     }
 
     @Override
-    public void findUserById(long id) {
-        users.get((int) id);
-
+    public User findUserById(long id) {
+        return userList
+                .stream()
+                .filter(user -> user.getId() == id)
+                .findFirst()
+                .get();
     }
 
     @Override
     public void deleteUser(long id) {
-        users.remove(id);
-
+        userList
+                .stream()
+                .forEach(user -> {
+                    if (user.getId() == id) {
+                        userList.remove(user);
+                    }
+                });
     }
 }
+
